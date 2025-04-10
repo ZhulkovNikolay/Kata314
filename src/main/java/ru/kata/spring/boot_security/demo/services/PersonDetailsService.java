@@ -24,7 +24,6 @@ public class PersonDetailsService implements UserDetailsService {
 
 
     //для последующего удобства поиск Юзера по имени мы не сами реализуем, а через Спринговский интерфейс
-    //Но как вариант мы могли бы реализовать это сами в AuthProviderImpl
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Person> person = peopleRepository.findByUsername(username);

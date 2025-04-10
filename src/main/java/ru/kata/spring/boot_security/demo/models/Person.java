@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "Person")
 public class Person {
-    //Будем использовать имя Person т.к. множество интерфейсов спринга уже заняты названием User
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
