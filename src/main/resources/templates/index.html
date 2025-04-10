@@ -6,7 +6,10 @@
 <body>
 <h1>Welcome to Index PAGE!</h1>
 
-<a href="/logout">Logout</a>
+<!--После подключения CSRF мы можем разлогиниваться только через POST запрос-->
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="Logout"/>
+</form>
 
 </body>
 </html>
