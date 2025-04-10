@@ -18,14 +18,11 @@ public class PersonValidator implements Validator {
         this.personDetailsService = personDetailsService;
     }
 
-    //говорит нам о том, что этот класс нужен для объектов класса Person
     @Override
     public boolean supports(Class<?> clazz) {
         return Person.class.equals(clazz);
     }
 
-    //В сервисе loadUserByUsername выбрасывает исключение. Мы опираемся на это исколючение
-    //Так делать неочень красиво
     //TODO: 82 Желательно самостоятельно реализовать PeopleService с тем же методом и заменить personDetailsService
     @Override
     public void validate(Object target, Errors errors) {
@@ -33,7 +30,7 @@ public class PersonValidator implements Validator {
         try {
             personDetailsService.loadUserByUsername(person.getUsername());
         } catch (UsernameNotFoundException ignored) {
-            return; //ловим исключение и игнорируем его. Если оно выброшено, значит все ОК. Пользователь с таким именем не найден
+            return;
         }
         errors.rejectValue("username","","Человек с таким именем пользователя существует" );
     }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminService {
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')") //условие при котором пускаем пользователя в этот метод
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void doAdminStuff(){
         System.out.println("Only Admin can do this");
     }

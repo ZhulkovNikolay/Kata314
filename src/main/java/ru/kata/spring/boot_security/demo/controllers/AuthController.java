@@ -36,22 +36,14 @@ public class AuthController {
         return "auth/registration";
     }
 
-    //Принимаем POST запрос
-    //сюда придут данные с формы регистрации.
-    //мы их получим с помощью @ModelAttribute("person")
-    //Valid - чтобы работали аннотации над полями Персона @Size(min = 2, max = 100, message = "Имя должно быть от 2 до 100 символов")
     @PostMapping("/registration")
     public String performRegistration(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
-        //дополнительно валидируем человека на предмет есть ли он в БД
-        //передаем person с формы и в bindingResult помещается ошибка если она есть
-        //человек с таким же именем не сможет зарегаться
         personValidator.validate(person, bindingResult);
 
         if (bindingResult.hasErrors())
             return "/auth/registration";
 
         registrationService.register(person);
-        //после успешной регистрации человек должен со своими зареганными данными аутентифицироваться
         return "redirect:/auth/login";
     }
 }

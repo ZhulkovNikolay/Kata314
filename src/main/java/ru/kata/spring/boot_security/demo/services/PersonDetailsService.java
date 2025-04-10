@@ -14,7 +14,6 @@ import java.util.Optional;
 @Service
 public class PersonDetailsService implements UserDetailsService {
 
-    //Внедряем наш ДАО слой
     private final PeopleRepository peopleRepository;
 
     @Autowired
@@ -22,8 +21,6 @@ public class PersonDetailsService implements UserDetailsService {
         this.peopleRepository = peopleRepository;
     }
 
-
-    //для последующего удобства поиск Юзера по имени мы не сами реализуем, а через Спринговский интерфейс
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Person> person = peopleRepository.findByUsername(username);
@@ -31,8 +28,6 @@ public class PersonDetailsService implements UserDetailsService {
         if (person.isEmpty())
             throw new UsernameNotFoundException("User not found!");
 
-        //если нашли человека, то оборачиваем в наш кастомный PersonDetails
-        //он реализует интерфейс UserDetails, а потому может быть возвращен
         return new PersonDetails(person.get());
     }
 }

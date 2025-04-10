@@ -9,7 +9,7 @@ import ru.kata.spring.boot_security.demo.models.Person;
 import java.util.Collection;
 import java.util.Collections;
 
-//Обертка над нашей сущностью Юзер для стандартизации
+
 public class PersonDetails implements UserDetails {
 
     private final Person person;
@@ -54,7 +54,7 @@ public class PersonDetails implements UserDetails {
         return true;
     }
 
-    //Кастмоный метод, чтобы мы имели доступ ко всем полям пользователя после его аутентификации
+
     public Person getPerson() {
         return this.person;
     }

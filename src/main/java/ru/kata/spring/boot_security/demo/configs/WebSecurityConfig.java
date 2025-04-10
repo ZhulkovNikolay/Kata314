@@ -42,8 +42,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(personDetailsService)
                 .passwordEncoder(getPasswordEncoder());
-        //СпрингСекурити при аутентификации автоматически будет прогонять пароль через Бкрипт
-        //2 зашифрованных пароля будут сравниваться.
     }
 
     @Bean
@@ -52,10 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 /*
-    //Алишев 79 25:00
-    //Алишев передает свой AuthProviderImpl
-    //Здесь же реализован шаблон Каты через роли. Поэтому временно мы его  уберем
-
     private final SuccessUserHandler successUserHandler;
 
     public WebSecurityConfig(SuccessUserHandler successUserHandler) {

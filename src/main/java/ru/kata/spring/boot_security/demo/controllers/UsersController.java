@@ -18,8 +18,6 @@ public class UsersController {
         this.adminService = adminService;
     }
 
-    //попробуем получить данные аутетифицированного пользователя
-    //из браузера по кукам достанется объект Principal
     @GetMapping("/showUserInfo")
     public String showUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
