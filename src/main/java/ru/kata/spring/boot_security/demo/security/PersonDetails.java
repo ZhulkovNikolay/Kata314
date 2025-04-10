@@ -1,11 +1,13 @@
 package ru.kata.spring.boot_security.demo.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.kata.spring.boot_security.demo.models.Person;
 
 
 import java.util.Collection;
+import java.util.Collections;
 
 //Обертка над нашей сущностью Юзер для стандартизации
 public class PersonDetails implements UserDetails {
@@ -18,7 +20,8 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; //будем получать роли из БД и возвращать коллекцию прав
+//TODO возвращаем список ролей, но здесь мы вернем только 1 (86 13:00)
+        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole()));
     }
 
     @Override

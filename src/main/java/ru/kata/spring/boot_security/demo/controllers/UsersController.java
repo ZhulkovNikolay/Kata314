@@ -24,4 +24,9 @@ public class UsersController {
         return "index";
     }
 
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "admin";
+    }
+
 }
