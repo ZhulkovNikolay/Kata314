@@ -46,3 +46,10 @@ public class AdminsController {
     }
 
 }
+
+//    private final AdminService adminService;
+//
+//    @Autowired
+//    public AdminsController(AdminService adminService) {
+//        this.adminService = adminService;
+//    }

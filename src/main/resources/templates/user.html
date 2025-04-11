@@ -7,6 +7,34 @@
 <body>
 <h1>User, welcome spring boot security page!</h1>
 
+
+
+
+
+<h1>Welcome, <span th:text="${user.username}">Username</span>!</h1>
+
+<table>
+    <tr>
+        <th>Name:</th>
+        <td th:text="${user.username}">Name</td>
+    </tr>
+    <tr>
+        <th>Email:</th>
+        <td th:text="${user.email}">Email</td>
+    </tr>
+    <tr>
+        <th>Password:</th>
+        <td th:text="${user.password}">Password</td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+
 <a th:href="@{/user}">На страницу юзера</a>
 <a th:href="@{/admin}">На страницу админа</a>
 <a th:href="@{/login}">На страницу логина</a>
