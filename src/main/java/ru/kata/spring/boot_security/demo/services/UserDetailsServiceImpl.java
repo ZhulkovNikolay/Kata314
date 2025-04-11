@@ -5,29 +5,30 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.kata.spring.boot_security.demo.models.Person;
-import ru.kata.spring.boot_security.demo.repositories.PeopleRepository;
-import ru.kata.spring.boot_security.demo.security.PersonDetails;
+import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 
 import java.util.Optional;
 
 @Service
-public class PersonDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final PeopleRepository peopleRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PersonDetailsService(PeopleRepository peopleRepository) {
-        this.peopleRepository = peopleRepository;
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Person> person = peopleRepository.findByUsername(username);
+
+        Optional<User> person = userRepository.findByUsername(username);
 
         if (person.isEmpty())
             throw new UsernameNotFoundException("User not found!");
 
-        return new PersonDetails(person.get());
+        return new UserDetailsImpl(person.get());
     }
 }

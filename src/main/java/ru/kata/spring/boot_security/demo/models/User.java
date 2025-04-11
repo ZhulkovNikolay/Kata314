@@ -1,13 +1,13 @@
 package ru.kata.spring.boot_security.demo.models;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Entity
-@Table(name = "Person")
-public class Person {
+@Table(name = "users")
+public class User {
 
     @Id
     @Column(name = "id")
@@ -19,22 +19,29 @@ public class Person {
     @Column(name = "username")
     private String username;
 
-    @Min(value = 1900, message = "Год рождения должен быть больше, чем 1900")
-    @Column(name = "year_of_birth")
-    private int yearOfBirth;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "role")
-    private String role;
+    //   @Column(name = "role")
+    // private String role;
 
-    public Person() {
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+
+    public User() {
     }
 
-    public Person(String username, int yearOfBirth) {
+    public User(String username, String email) {
         this.username = username;
-        this.yearOfBirth = yearOfBirth;
+        this.email = email;
     }
 
     public int getId() {
@@ -53,12 +60,12 @@ public class Person {
         this.username = username;
     }
 
-    public int getYearOfBirth() {
-        return yearOfBirth;
+    public String getEmail() {
+        return email;
     }
 
-    public void setYearOfBirth(int yearOfBirth) {
-        this.yearOfBirth = yearOfBirth;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -69,20 +76,29 @@ public class Person {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+//    public String getRole() {
+//        return role;
+//    }
+//
+//    public void setRole(String role) {
+//        this.role = role;
+//    }
+
+
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", yearOfBirth=" + yearOfBirth +
+                ", email=" + email +
                 ", password='" + password + '\'' +
                 '}';
     }
