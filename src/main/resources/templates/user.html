@@ -5,11 +5,6 @@
     <title>Spring Security Example</title>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
-
-
-
-
 
 <h1>Welcome, <span th:text="${user.username}">Username</span>!</h1>
 
@@ -27,13 +22,6 @@
         <td th:text="${user.password}">Password</td>
     </tr>
 </table>
-
-
-
-
-
-
-
 
 <a th:href="@{/user}">На страницу юзера</a>
 <a th:href="@{/admin}">На страницу админа</a>

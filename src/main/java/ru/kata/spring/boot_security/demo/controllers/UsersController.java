@@ -10,14 +10,11 @@ import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 @Controller
 public class UsersController {
 
-    //5. Пользователь с ролью user должен иметь доступ только к своей домашней странице /user, где выводятся его данные.
-    // Доступ к этой странице должен быть только у пользователей с ролью user и admin.
-
     @GetMapping("/user")
     public String showUserInfo(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
-        model.addAttribute("user", userDetailsImpl);
+        model.addAttribute("user", userDetailsImpl.getUser());
         return "user";
     }
 
