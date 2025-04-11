@@ -5,8 +5,7 @@
     <title>Login page</title>
 </head>
 <body>
-<!--Данные с этой формы уходят на адрес /process_login. Он же указан в конфиге Секурити
- Токе нужен только в форме аутентификации-->
+
 <form name="f" method="post" action="/process_login">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 

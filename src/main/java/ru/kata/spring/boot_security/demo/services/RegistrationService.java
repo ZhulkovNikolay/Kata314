@@ -8,7 +8,6 @@ import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
-
 import java.util.Set;
 
 @Service
@@ -28,9 +27,7 @@ public class RegistrationService {
     @Transactional
     public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-       // user.setRole("ROLE_USER");
 
-        //Находим или создаем роль USER
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseGet(() -> {
                     Role newRole = new Role();
@@ -38,8 +35,7 @@ public class RegistrationService {
                     return roleRepository.save(newRole);
                 });
 
-        //Назначаем роль пользователю
-        user.setRoles(Set.of(userRole)); // Set.of() создает неизменяемый Set
+        user.setRoles(Set.of(userRole));
 
         userRepository.save(user);
     }

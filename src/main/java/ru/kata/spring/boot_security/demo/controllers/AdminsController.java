@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RegistrationService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
-
 import javax.validation.Valid;
 
 @Controller
@@ -46,10 +45,3 @@ public class AdminsController {
     }
 
 }
-
-//    private final AdminService adminService;
-//
-//    @Autowired
-//    public AdminsController(AdminService adminService) {
-//        this.adminService = adminService;
-//    }

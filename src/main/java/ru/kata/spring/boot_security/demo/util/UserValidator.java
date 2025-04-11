@@ -1,21 +1,19 @@
 package ru.kata.spring.boot_security.demo.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.services.UserDetailsServiceImpl;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+import java.util.Optional;
 
 @Component
 public class UserValidator implements Validator {
 
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public UserValidator(UserDetailsServiceImpl userDetailsServiceImpl) {
-        this.userDetailsServiceImpl = userDetailsServiceImpl;
+    public UserValidator(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -23,15 +21,19 @@ public class UserValidator implements Validator {
         return User.class.equals(clazz);
     }
 
-    //TODO: 82 Желательно самостоятельно реализовать PeopleService с тем же методом и заменить personDetailsService
     @Override
     public void validate(Object target, Errors errors) {
         User user = (User) target;
-        try {
-            userDetailsServiceImpl.loadUserByUsername(user.getUsername());
-        } catch (UsernameNotFoundException ignored) {
-            return;
+
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+
+        if (existingUser.isPresent()) {
+            errors.rejectValue(
+                    "username",
+                    "username.duplicate",
+                    "Пользователь с таким именем уже существует"
+            );
         }
-        errors.rejectValue("username","","Человек с таким именем пользователя существует" );
+
     }
 }

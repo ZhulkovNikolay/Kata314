@@ -7,8 +7,6 @@
 <body>
 Admin Page
 
-<!--форма отправляется пост запросом на адрес /auth/registration.
-В качестве объекта формы - user с контроллера-->
 <form th:method="POST" th:action="@{/admin}" th:object="${user}">
     <label for="username">Введите имя пользователя: </label>
     <input type="text" th:field="*{username}" id="username"/>
