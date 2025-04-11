@@ -16,23 +16,15 @@ public class UsersController {
 //        this.adminService = adminService;
 //    }
 
+    //5. Пользователь с ролью user должен иметь доступ только к своей домашней странице /user, где выводятся его данные.
+    // Доступ к этой странице должен быть только у пользователей с ролью user и admin.
+
     @GetMapping("/user")
     public String showUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
         System.out.println(userDetailsImpl.getUser());
         return "user";
-    }
-
-    @GetMapping("/index")
-    public String index() {
-        return "index";
-    }
-
-    @GetMapping("/admin")
-    public String adminPage() {
-        //adminService.doAdminStuff();
-        return "admin";
     }
 
 }

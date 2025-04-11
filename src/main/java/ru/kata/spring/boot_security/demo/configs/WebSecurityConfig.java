@@ -28,18 +28,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/user").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/auth/login", "/auth/registration", "error").permitAll()
+                .antMatchers("/login", "error").permitAll()
                 .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
-                .formLogin().loginPage("/auth/login")
+                .formLogin().loginPage("/login")
                 .successHandler(successUserHandler)
                 .loginProcessingUrl("/process_login")
                 //.defaultSuccessUrl("/index", true)
-                .failureUrl("/auth/login?error")
+                .failureUrl("/login?error")
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutSuccessUrl("/login");
     }
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

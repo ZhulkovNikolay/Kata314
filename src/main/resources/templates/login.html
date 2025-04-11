@@ -24,10 +24,13 @@
 
 </form>
 
-<a th:href="@{/auth/registration}">Зарегистрироваться</a>
 <a th:href="@{/user}">На страницу юзера</a>
 <a th:href="@{/admin}">На страницу админа</a>
-<a th:href="@{/index}">На индекс</a>
+<a th:href="@{/login}">На страницу логина</a>
+
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="Logout"/>
+</form>
 
 </body>
 </html>
