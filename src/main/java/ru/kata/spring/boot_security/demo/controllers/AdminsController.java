@@ -7,21 +7,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.services.RegistrationService;
+import ru.kata.spring.boot_security.demo.services.UserServiceImpl;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 import javax.validation.Valid;
 
 @Controller
 public class AdminsController {
 
-    private final RegistrationService registrationService;
+    private final UserServiceImpl userServiceImpl;
     private final UserValidator userValidator;
 
     @Autowired
-    public AdminsController(RegistrationService registrationService, UserValidator userValidator) {
-        this.registrationService = registrationService;
+    public AdminsController(UserServiceImpl userServiceImpl, UserValidator userValidator) {
+        this.userServiceImpl = userServiceImpl;
         this.userValidator = userValidator;
     }
+
+    /*
+
+class AdminsController
+- читай ТЗ. Админ должен создавать пользователей, изменять их, удалять.
+* Так же обрати внимание на роли - при создании/обновлении надо
+* получить все роли из базы и предложить их админу на фронте,
+* а потом в ПОСТ методе их надо присвоить юзеру
+* */
 
     @GetMapping("/login")
     public String loginPage() {
@@ -40,7 +49,7 @@ public class AdminsController {
         if (bindingResult.hasErrors())
             return "/admin";
 
-        registrationService.register(user);
+        userServiceImpl.register(user);
         return "redirect:/login";
     }
 

@@ -1,13 +1,18 @@
 package ru.kata.spring.boot_security.demo.models;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @Column(name = "id")
@@ -16,7 +21,7 @@ public class User {
 
     @NotEmpty(message = "Имя не должно быть пустым")
     @Size(min = 2, max = 100, message = "Имя должно быть от 2 до 100 символов")
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false) //- сделай логин уникальным полем
     private String username;
 
     @Column(name = "email")
@@ -53,6 +58,26 @@ public class User {
         return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -63,6 +88,16 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    //- должен имплементировать UserDetails по ТЗ
+    //- class UserDetailsImpl вырежи
+    //- Role должен имплементировать GrantedAuthority по ТЗ
+    // Поскольку Role implements GrantedAuthority, каждая роль уже является объектом GrantedAuthority
+    // и мы просто возвращаем коллекцию ролей
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(this.getRoles());
     }
 
     public String getPassword() {

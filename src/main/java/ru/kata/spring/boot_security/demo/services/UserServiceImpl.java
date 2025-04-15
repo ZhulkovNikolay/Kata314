@@ -1,42 +1,40 @@
 package ru.kata.spring.boot_security.demo.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.models.Role;
+import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.repositories.RoleService;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
+import ru.kata.spring.boot_security.demo.repositories.UserService;
+
 import java.util.Set;
 
 @Service
-public class RegistrationService {
+public class UserServiceImpl implements UserService {
+
+    //- class RegistrationService вырежи
+    //- создай сервисы ролей и юзера с интерфейсами
+    //- шифруй пароли юзерам в сервисе
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
 
-    @Autowired
-    public RegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
     }
 
+
+    @Override
     @Transactional
     public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseGet(() -> {
-                    Role newRole = new Role();
-                    newRole.setName("ROLE_USER");
-                    return roleRepository.save(newRole);
-                });
-
+        Role userRole = roleService.findOrCreateRole("USER");
         user.setRoles(Set.of(userRole));
-
         userRepository.save(user);
     }
 
