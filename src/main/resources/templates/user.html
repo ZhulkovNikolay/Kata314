@@ -20,6 +20,16 @@
         <th>Password:</th>
         <td th:text="${user.password}">Password</td>
     </tr>
+    <tr>
+        <th>Roles:</th>
+        <td>
+            <span th:each="role, iterStat : ${user.roles}"
+                  th:text="${role.name} + (${not iterStat.last} ? ', ' : '')">
+            </span>
+        </td>
+    </tr>
+
+
 </table>
 
 <a th:href="@{/user}">На страницу юзера</a>

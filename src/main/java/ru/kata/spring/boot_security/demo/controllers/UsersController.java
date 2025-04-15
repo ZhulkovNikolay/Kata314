@@ -10,6 +10,11 @@ import ru.kata.spring.boot_security.demo.models.User;
 @Controller
 public class UsersController {
 
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
     @GetMapping("/user")
     public String showUserInfo(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

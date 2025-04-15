@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Users</title>
+</head>
+<body>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>email</th>
+        <th>Operations</th>
+    </tr>
+
+    <tr th:each="user : ${users}">
+        <td><a th:text="${user.getUsername()}">name</a></td>
+        <td><a th:text="${user.getEmail()}">email</a></td>
+
+        <!-- Переход на страницу просмотра пользователя -->
+        <td>
+            <form th:action="@{/admin/user/{id}(id=${user.id})}"
+                  th:method="GET">
+                <button type="submit">Посмотреть</button>
+            </form>
+
+        </td>
+
+        <!-- Переход на страницу редактирования пользователя -->
+        <td>
+            <form th:action="@{/admin/edit-user/{id}(id=${user.id})}"
+                  th:method="GET">
+                <input type="submit" value="Update">
+            </form>
+        </td>
+
+        <td>
+            <!-- Форма для удаления -->
+            <form th:action="@{/admin/deleteUser/{id}(id=${user.id})}"
+                  th:method="DELETE">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+
+    </tr>
+</table>
+<br/>
+<hr/>
+<!--<input type="button" value="Add"-->
+<!--       onclick="window.location.href = 'addNewUser'" />-->
+
+<form th:action="@{/admin/registration}" th:method="GET">
+    <input type="submit" value="Register New User"/>
+</form>
+
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="logout"/>
+</form>
+
+<a th:href="@{/user}">На страницу юзера</a>
+<a th:href="@{/admin}">На страницу админа</a>
+<a th:href="@{/login}">На страницу логина</a>
+
+</body>
+</html>

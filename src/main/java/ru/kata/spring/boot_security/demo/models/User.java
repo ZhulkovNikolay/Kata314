@@ -2,13 +2,13 @@ package ru.kata.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.thymeleaf.Thymeleaf;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -36,7 +36,9 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+
+    @NotEmpty(message = "Выберите хотя бы одну роль")
+    private Set<Role> roles  = new HashSet<>();
 
     public User() {
     }
@@ -114,6 +116,11 @@ public class User implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    // Метод, чтобы выводить список ролей на HTML
+    public List<Integer> getRoleIds() {
+        return roles.stream().map(Role::getId).collect(Collectors.toList());
     }
 
     @Override
