@@ -36,15 +36,6 @@ public class AdminsController {
         return "allusers";
     }
 
-    //Возможность админу перейти на страницу выбранного пользователя из списка
-    @GetMapping("/user/{id}")
-    public String showUser(@PathVariable int id, Model model) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        model.addAttribute("user", user);
-        return "user";
-    }
-
     //Удаление пользователя
     @DeleteMapping("/deleteUser/{id}")
     public String deleteUser(@PathVariable int id) {
@@ -56,9 +47,9 @@ public class AdminsController {
     @PostMapping("/registration")
     public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) return "registration";
+        if (bindingResult.hasErrors()) return "allusers";
         userService.register(user);
-        return "redirect:/login";
+        return "redirect:/admin";
     }
 
     //HTML форма для редактирования выбранного из списка пользователя.

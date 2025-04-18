@@ -27,10 +27,8 @@ public class UsersController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         model.addAttribute("user", user);
-       // model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.findAll());
-        return "allusers";
-      //  return "user";
+        return "user";
     }
 
 }

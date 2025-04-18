@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,8 +29,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Set<Role> roles  = new HashSet<>();
+       // Role userRole = roleService.findOrCreateRole("USER");
         Role userRole = roleService.findOrCreateRole("USER");
-        user.setRoles(Set.of(userRole));
+      //  user.setRoles(Set.of(userRole));
+        user.setRoles(user.getRoles());
         userRepository.save(user);
     }
 
