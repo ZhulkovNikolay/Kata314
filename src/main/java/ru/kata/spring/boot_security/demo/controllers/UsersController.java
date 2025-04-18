@@ -6,9 +6,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.services.RoleService;
 
 @Controller
 public class UsersController {
+
+    private final RoleService roleService;
+
+    public UsersController(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @GetMapping("/login")
     public String loginPage() {
@@ -20,7 +27,10 @@ public class UsersController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         model.addAttribute("user", user);
-        return "user";
+       // model.addAttribute("user", new User());
+        model.addAttribute("roles", roleService.findAll());
+        return "allusers";
+      //  return "user";
     }
 
 }

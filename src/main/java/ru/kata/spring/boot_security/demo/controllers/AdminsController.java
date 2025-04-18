@@ -31,6 +31,8 @@ public class AdminsController {
     @GetMapping()
     public String showAllUsers(Model model) {
         model.addAttribute("users", userService.findAll());
+        model.addAttribute("user", new User());
+        model.addAttribute("roles", roleService.findAll());
         return "allusers";
     }
 
@@ -48,12 +50,6 @@ public class AdminsController {
     public String deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
         return "redirect:/admin";
-    }
-
-    //HTML форма для регистрации нового пользователя.
-    @GetMapping("/registration")
-    public String registrationPage(@ModelAttribute("user") User user) {
-        return "registration";
     }
 
     //Собсна сам процесс регистрации нового пользователя
