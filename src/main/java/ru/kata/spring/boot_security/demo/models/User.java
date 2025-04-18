@@ -35,7 +35,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-    @NotEmpty(message = "Выберите хотя бы одну роль")
+    // @NotEmpty(message = "Выберите хотя бы одну роль")
     private Set<Role> roles  = new HashSet<>();
 
     public User() {

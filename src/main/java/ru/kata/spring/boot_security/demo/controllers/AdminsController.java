@@ -52,20 +52,15 @@ public class AdminsController {
 
     //HTML форма для регистрации нового пользователя.
     @GetMapping("/registration")
-    public String registrationPage(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("allRoles", roleService.findAll());
+    public String registrationPage(@ModelAttribute("user") User user) {
         return "registration";
     }
 
     //Собсна сам процесс регистрации нового пользователя
     @PostMapping("/registration")
-    public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
+    public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("allRoles", roleService.findAll());
-            System.out.println("Ошибки валидации: " + bindingResult.getAllErrors());
-            return "registration";
-        } else
+        if (bindingResult.hasErrors()) return "registration";
         userService.register(user);
         return "redirect:/login";
     }

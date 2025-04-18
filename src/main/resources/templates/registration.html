@@ -22,17 +22,6 @@ Registration page
     <input type="password" th:field="*{password}" id="password"/>
     <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
     <br/>
-
-    <label>Роли пользователя: </label>
-    <select multiple name="roles">
-        <option th:each="role : ${allRoles}"
-                th:value="${role.id}"
-                th:text="${role.name}"
-                th:selected="${#lists.contains(user.roleIds, role.id)}">
-        </option>
-    </select>
-    <div style="color:red" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}">Roles Error</div>
-    <br/>
     <br/>
 
     <input type="submit" value="Sign up!">
