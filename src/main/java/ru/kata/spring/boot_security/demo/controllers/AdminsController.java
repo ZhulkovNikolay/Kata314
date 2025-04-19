@@ -5,11 +5,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 @Controller
@@ -36,12 +38,17 @@ public class AdminsController {
         return "allusers";
     }
 
-    //Удаление пользователя
-    @DeleteMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable int id) {
-        userService.deleteUserById(id);
+ //   Удаление пользователя
+    @DeleteMapping("/deleteUser")
+    public String deleteUser(@RequestParam("id") int id) {
+        System.out.println("зашли в метод delete");
+            userService.deleteUserById(id);
+
+        System.out.println("отработал delete");
         return "redirect:/admin";
     }
+
+
 
     //Собсна сам процесс регистрации нового пользователя
     @PostMapping("/registration")
