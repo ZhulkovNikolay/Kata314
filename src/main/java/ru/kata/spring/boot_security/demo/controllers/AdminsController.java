@@ -17,6 +17,10 @@ import javax.validation.Valid;
 @RequestMapping("/admin")
 public class AdminsController {
 
+    // Ссылка на видос, как это все работает
+    // (╮°-°)╮┳━━┳ ( ╯°□°)╯ ┻━━┻
+    // https://youtu.be/NyYhLL6XmnM
+
     private final UserService userService;
     private final UserValidator userValidator;
     private final RoleService roleService;
