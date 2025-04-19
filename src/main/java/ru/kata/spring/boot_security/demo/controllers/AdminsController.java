@@ -5,13 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 @Controller
@@ -59,29 +57,11 @@ public class AdminsController {
         return "redirect:/admin";
     }
 
-    //HTML форма для редактирования выбранного из списка пользователя.
-    @GetMapping("/edit-user/{id}")
-    public String editPage(@PathVariable int id, Model model) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id"));
-
-        model.addAttribute("user", user);
-        model.addAttribute("allRoles", roleService.findAll());
-        return "edit-user";
-    }
-
     //Собсна сам процесс редактирования выбранного из списка пользователя.
-    @PostMapping("/edit-user/{id}")
-    public String performEdit(@PathVariable int id, @ModelAttribute("user") @Valid User user,
-                              BindingResult bindingResult,
-                              Model model) {
-
-        if (bindingResult.hasErrors()) { //при ошибке возвращаемся на страницу и сразу внедряем туда роли
-            model.addAttribute("allRoles", roleService.findAll());
-            return "edit-user";
-        }
-
-        user.setId(id); // Убедимся, что ID сохраняется
+    @PostMapping("/edit-user")
+    public String performEdit( @ModelAttribute("user") @Valid User user,
+                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return "allusers";
         userService.updateUser(user);
         return "redirect:/admin";
     }
