@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
@@ -36,33 +37,40 @@ public class AdminsController {
         return "allusers";
     }
 
- //   Удаление пользователя
+    //Удаление пользователя через Модальное окно
     @DeleteMapping("/deleteUser")
     public String deleteUser(@RequestParam("id") int id) {
         System.out.println("зашли в метод delete");
-            userService.deleteUserById(id);
+        userService.deleteUserById(id);
 
         System.out.println("отработал delete");
         return "redirect:/admin";
     }
 
-
-
-    //Собсна сам процесс регистрации нового пользователя
+    //Процесс регистрации нового пользователя
     @PostMapping("/registration")
-    public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+    public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         userValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) return "allusers";
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", bindingResult);
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/admin#nav-new-user";
+        }
         userService.register(user);
         return "redirect:/admin";
     }
 
-    //Собсна сам процесс редактирования выбранного из списка пользователя.
+    //Процесс редактирования выбранного из списка пользователя через Модальное окно.
     @PostMapping("/edit-user")
-    public String performEdit( @ModelAttribute("user") @Valid User user,
-                               BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) return "allusers";
+    public String performEdit(@ModelAttribute("user") @Valid User user,
+                              BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", bindingResult);
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/admin";
+        }
         userService.updateUser(user);
+        redirectAttributes.addFlashAttribute("success", "User updated!");
         return "redirect:/admin";
     }
 

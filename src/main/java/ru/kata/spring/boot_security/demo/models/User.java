@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -35,8 +36,8 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-    // @NotEmpty(message = "Выберите хотя бы одну роль")
-    private Set<Role> roles  = new HashSet<>();
+    @NotEmpty(message = "Выберите хотя бы одну роль")
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
@@ -90,11 +91,6 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    //- должен имплементировать UserDetails по ТЗ
-    //- class UserDetailsImpl вырежи
-    //- Role должен имплементировать GrantedAuthority по ТЗ
-    // Поскольку Role implements GrantedAuthority, каждая роль уже является объектом GrantedAuthority
-    // и мы просто возвращаем коллекцию ролей
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>(this.getRoles());
@@ -116,7 +112,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    // Метод, чтобы выводить список ролей на HTML
     public List<Integer> getRoleIds() {
         return roles.stream().map(Role::getId).collect(Collectors.toList());
     }

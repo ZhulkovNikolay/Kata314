@@ -51,7 +51,7 @@
 
     <!-- Контент для каждой роли -->
     <div class="tab-content flex-grow-1" id="v-pills-tabContent">
-        <!-- Контент для роли ADMIN -->
+
         <div th:each="role : ${#authentication.principal.authorities}"
              class="tab-pane fade"
              th:classappend="${roleStat.first} ? 'show active' : ''"

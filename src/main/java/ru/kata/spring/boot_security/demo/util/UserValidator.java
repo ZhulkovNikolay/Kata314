@@ -5,6 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+
 import java.util.Optional;
 
 @Component
@@ -34,6 +35,11 @@ public class UserValidator implements Validator {
                     "Пользователь с таким именем уже существует"
             );
         }
+        // Проверка ролей
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            errors.rejectValue("roles", "roles.required", "Выберите минимум одну роль");
+        }
+
 
     }
 }

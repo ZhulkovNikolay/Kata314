@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
@@ -50,8 +51,6 @@ public class Role implements GrantedAuthority {
         this.users = users;
     }
 
-
-    //- переопредели иквелз и хэшкод (используй ид)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,8 +64,6 @@ public class Role implements GrantedAuthority {
         return Objects.hash(id, name);
     }
 
-
-    //- должен имплементировать GrantedAuthority по ТЗ
     @Override
     public String getAuthority() {
         return name;

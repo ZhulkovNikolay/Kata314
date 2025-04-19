@@ -103,26 +103,17 @@
 
                                         <tbody>
                                         <tr th:each="user, iter : ${users}">
-                                            <!-- ID -->
                                             <td th:text="${user.id}">#</td>
-                                            <!-- Name -->
                                             <td th:text="${user.username}">name</td>
-                                            <!-- Email -->
                                             <td th:text="${user.email}">email</td>
-                                            <!-- Roles -->
                                             <td>
              <span th:each="role, stat : ${user.roles}"
                    th:text="${#strings.replace(role.name, 'ROLE_', '')} + (${not stat.last} ? ', ' : '')">
         role
     </span>
                                             </td>
-                                            <!-- Edit Button editUserModal-->
+                                            <!-- Edit Button -->
                                             <td>
-                                               <!-- <form th:action="@{/admin/edit-user/{id}(id=${user.id})}">
-                                                    <button type="submit" class="btn btn-sm btn-primary">
-                                                        Edit
-                                                    </button>
-                                                </form>-->
                                                 <button data-bs-toggle="modal"
                                                         data-bs-target="#editUserModal"
                                                         th:data-user-id="${user.id}"
@@ -136,8 +127,6 @@
                                             </td>
                                             <!-- Delete Button -->
                                             <td>
-                                                <!--<form th:action="@{/admin/deleteUser/{id}(id=${user.id})}"
-                                                      th:method="DELETE">-->
                                                 <button data-bs-toggle="modal"
                                                         class="btn btn-sm btn-danger"
                                                         data-bs-target="#deleteUserModal"
@@ -147,7 +136,6 @@
                                                         th:data-user-roles="${#strings.listJoin(user.roles.![name], ', ')}">
                                                     Delete
                                                 </button>
-                                                <!-- </form>-->
                                             </td>
                                         </tr>
                                         </tbody>
@@ -204,7 +192,7 @@
                                          th:errors="*{password}">Ошибка пароля
                                     </div>
                                 </div>
-                                <!---->
+
                                 <div class="mb-3">
                                     <label class="form-label">Роли пользователя:</label>
                                     <select class="form-select"
@@ -218,13 +206,11 @@
                                                 th:selected="${#lists.contains(user.roleIds, role.id)}">
                                         </option>
                                     </select>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('roles')}"
-                                         th:errors="*{roles}">
-                                        Roles Error
+                                    <div class="invalid-feedback">
+                                        <span th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></span>
+                                        <span th:unless="${#fields.hasErrors('roles')}">Выберите минимум одну роль</span>
                                     </div>
                                 </div>
-                                <!---->
-
 
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary">Зарегистрировать</button>
@@ -243,13 +229,7 @@
                     <div class="card-header p-2">
                         <p class="fw-bold fs-5 mb-0">About user</p>
                     </div>
-                    <!--  <div class="card-body"> -->
-                    <!--
-                    <h5 th:text="${'Hello, ' + #authentication.principal.username}"></h5>
-                    <p>Email: <span th:text="${#authentication.principal.email}"></span></p>
-                     Другие данные пользователя
-                     -->
-                    <!--//////////////////////////////////////-->
+
                     <div class="card-body p-0 d-flex flex-column">
                         <div class="table-responsive pe-4 ps-4">
                             <!-- Таблица пользователей -->
@@ -265,13 +245,9 @@
 
                                 <tbody>
                                 <tr>
-                                    <!-- ID -->
                                     <td th:text="${#authentication.principal.id}">#</td>
-                                    <!-- Name -->
                                     <td th:text="${#authentication.principal.username}">name</td>
-                                    <!-- Email -->
                                     <td th:text="${#authentication.principal.email}">email</td>
-                                    <!-- Roles -->
                                     <td>
              <span th:each="role, stat : ${#authentication.principal.authorities}"
                    th:text="${#strings.replace(role.authority, 'ROLE_', '')} + (${not stat.last} ? ', ' : '')">
@@ -329,6 +305,10 @@
                                     th:text="${role.name}">
                             </option>
                         </select>
+                        <div class="invalid-feedback">
+                            <span th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></span>
+                            <span th:unless="${#fields.hasErrors('roles')}">Выберите минимум одну роль</span>
+                        </div>
                     </div>
                 </div>
 
@@ -340,6 +320,7 @@
         </div>
     </div>
 </div>
+
 <!-- Модальное окно УДАЛЕНИЕ -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1">
     <div class="modal-dialog">
@@ -386,9 +367,10 @@
         </div>
     </div>
 </div>
+
 <!-- СКРИПТ заполнения Модального окна УДАЛЕНИЕ -->
 <script>
-    document.getElementById('deleteUserModal').addEventListener('show.bs.modal', function(event) {
+    document.getElementById('deleteUserModal').addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
 
         // Устанавливаем ID в скрытое поле
@@ -404,7 +386,7 @@
 
 <!-- СКРИПТ заполнения Модального окна РЕДАКТИРОВАНИЕ -->
 <script>
-    document.getElementById('editUserModal').addEventListener('show.bs.modal', function(event) {
+    document.getElementById('editUserModal').addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const modal = this;
 
@@ -418,6 +400,30 @@
         const roleSelect = modal.querySelector('select[name="roles"]');
         Array.from(roleSelect.options).forEach(option => {
             option.selected = selectedRoles.includes(option.value);
+        });
+    });
+</script>
+
+<script>
+    // Валидация форм при отправке
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function (event) {
+            const roleSelect = form.querySelector('select[name="roles"]');
+            if (roleSelect && roleSelect.selectedOptions.length === 0) {
+                event.preventDefault();
+                roleSelect.classList.add('is-invalid');
+                roleSelect.nextElementSibling.style.display = 'block';
+            }
+        });
+    });
+
+    // Сброс ошибок при изменении выбора
+    document.querySelectorAll('select[name="roles"]').forEach(select => {
+        select.addEventListener('change', function () {
+            if (this.selectedOptions.length > 0) {
+                this.classList.remove('is-invalid');
+                this.nextElementSibling.style.display = 'none';
+            }
         });
     });
 </script>
