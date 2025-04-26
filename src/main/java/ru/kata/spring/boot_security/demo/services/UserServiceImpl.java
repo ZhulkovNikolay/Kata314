@@ -1,11 +1,16 @@
 package ru.kata.spring.boot_security.demo.services;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +35,7 @@ public class UserServiceImpl implements UserService {
         //Role userRole = roleService.findOrCreateRole("USER");
         //user.setRoles(Set.of(userRole));
         user.setRoles(user.getRoles());
+        enrichUser(user);
         userRepository.save(user);
     }
 
@@ -49,7 +55,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findById(int id) {
-        return userRepository.findById(id);
+        Optional<User> foundUser = userRepository.findById(id);
+        //return userRepository.findById(id);
+        return foundUser;
     }
 
     @Override
@@ -63,7 +71,21 @@ public class UserServiceImpl implements UserService {
         existingUser.setRoles(user.getRoles());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        existingUser.setUpdatedAt(LocalDateTime.now());
+
         userRepository.save(existingUser);
+    }
+
+    private void enrichUser(User user) {
+
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        user.setCreatedWho(username);
+        //user.setCreatedWho("ADMIN");
     }
 
 }

@@ -22,13 +22,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.successUserHandler = successUserHandler;
     }
 
+    //TODO вернуть csrf
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                .csrf().disable()//временное отключение для POSTMAN
+                .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/login", "error").permitAll()
                 .anyRequest().hasAnyRole("USER", "ADMIN")
+                .and()
+                .httpBasic()//Чтобы работал Postman
                 .and()
                 .formLogin().loginPage("/login")
                 .successHandler(successUserHandler)

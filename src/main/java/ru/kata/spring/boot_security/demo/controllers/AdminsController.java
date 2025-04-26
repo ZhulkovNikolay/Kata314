@@ -17,13 +17,13 @@ import javax.validation.Valid;
 @RequestMapping("/admin")
 public class AdminsController {
 
-    // Ссылка на видос, как это все работает
-    // (╮°-°)╮┳━━┳ ( ╯°□°)╯ ┻━━┻
-    // https://youtu.be/NyYhLL6XmnM
-
     private final UserService userService;
     private final UserValidator userValidator;
     private final RoleService roleService;
+
+    //1. Написать Rest-контроллеры для вашего приложения.
+    //2. Переписать вывод (заполнение) таблицы, модальных окон и т.д. на JS c помощью Fetch API, допускается использование JQuery.
+    //3. При любых изменениях данных страница приложения не должна перезагружаться!
 
     @Autowired
     public AdminsController(UserService userService, UserValidator userValidator, RoleService roleService) {
@@ -68,12 +68,18 @@ public class AdminsController {
     @PostMapping("/edit-user")
     public String performEdit(@ModelAttribute("user") @Valid User user,
                               BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        System.out.println("зашли в performEdit");
         if (bindingResult.hasErrors()) {
+            System.out.println("зашли в bindingResult.hasErrors()");
+            System.out.println(bindingResult.getFieldErrors());
+            System.out.println(bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", bindingResult);
             redirectAttributes.addFlashAttribute("user", user);
             return "redirect:/admin";
         }
+        System.out.println("прошли проверку в performEdit");
         userService.updateUser(user);
+        System.out.println("отработал userService.updateUser(user);");
         redirectAttributes.addFlashAttribute("success", "User updated!");
         return "redirect:/admin";
     }

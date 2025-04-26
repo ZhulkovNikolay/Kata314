@@ -1,11 +1,14 @@
 package ru.kata.spring.boot_security.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,10 +27,22 @@ public class User implements UserDetails {
     private String username;
 
     @Column(name = "email")
+    @Email
+    @NotEmpty(message = "Почтовый адрес не должен быть пустым")
     private String email;
 
     @Column(name = "password")
     private String password;
+
+    //данные поля приходят не от клиента, а назначаются сервером в DTO
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "created_who")
+    private String createdWho;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -36,6 +51,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
+    @JsonManagedReference
     @NotEmpty(message = "Выберите хотя бы одну роль")
     private Set<Role> roles = new HashSet<>();
 
@@ -89,6 +105,30 @@ public class User implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedWho() {
+        return createdWho;
+    }
+
+    public void setCreatedWho(String createdWho) {
+        this.createdWho = createdWho;
     }
 
     @Override
