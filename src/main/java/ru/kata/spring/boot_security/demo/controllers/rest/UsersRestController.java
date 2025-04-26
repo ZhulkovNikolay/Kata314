@@ -4,9 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +18,11 @@ import ru.kata.spring.boot_security.demo.util.UserNotCreatedException;
 import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -33,26 +30,34 @@ public class UsersRestController {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UsersRestController(UserService userService, RoleService roleService) {
+    public UsersRestController(UserService userService, RoleService roleService, ModelMapper modelMapper) {
         this.userService = userService;
         this.roleService = roleService;
-    }
-
-    @GetMapping("/sayHello")
-    public String sayHello() {
-        return "Hello! This is REST!11";
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return userService.findAll();
+    public List<UserDTO> getUsers() {
+        //return userService.findAll();
+        return userService.findAll().stream().map(this::convertToUserDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/users/{id}")
-    public Optional<User> getUser(@PathVariable("id") int id) {
-        return userService.findById(id);//Jackson конвертирует отданный объект в JSON
+    public UserDTO getUser(@PathVariable("id") int id) {
+      //  return userService.findById(id);//Jackson конвертирует отданный объект в JSON
+        Optional<User> optionalUser = userService.findById(id);
+        if (optionalUser.isPresent()){
+            UserDTO userDTO = convertToUserDTO(optionalUser.get());
+          //  return ResponseEntity.ok(userDTO);
+            return userDTO;
+        } else {
+            throw new UserNotFoundException("User with ID " + id + " not found");
+        }
+
     }
 
     //ResponseEntity<> - может вернуть любой объект и Jackson его конвертнет в JSON
@@ -82,7 +87,6 @@ public class UsersRestController {
     }
 
     //Эти методы возвращают JSON с сообщением об ошибке
-
     @ExceptionHandler
     private ResponseEntity<UserErrorResponse> handleException(UserNotFoundException e) {
         UserErrorResponse response = new UserErrorResponse(
@@ -101,17 +105,8 @@ public class UsersRestController {
     }
 
     private User convertToUser(UserRegistrationDTO userRegistrationDTO) {
-    //    System.out.println("зашли в convertToUser");
-   //     ModelMapper modelMapper = new ModelMapper();
-     //   System.out.println("создали объект modelMapper");
-   //     User user = modelMapper.map(userRegistrationDTO, User.class);
-    //    System.out.println("закончили конвертарцию через modelMapper");
-        System.out.println("Зашли в convertToUser");
-        User user = new User();
-
-        user.setUsername(userRegistrationDTO.getUsername());
-        user.setEmail(userRegistrationDTO.getEmail());
-        user.setPassword(userRegistrationDTO.getPassword());
+        // ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userRegistrationDTO, User.class);
 
         Set<Role> roles = new HashSet<>();
         for (Integer roleId : userRegistrationDTO.getRoleIds()) {
@@ -120,11 +115,13 @@ public class UsersRestController {
             roles.add(role);
         }
         user.setRoles(roles);
-
         // user.setRoles(userRegistrationDTO.getRoleIds());
 
         return user;
     }
 
+    private UserDTO convertToUserDTO(User user) {
+        return modelMapper.map(user, UserDTO.class);
+    }
 
 }
