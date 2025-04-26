@@ -40,24 +40,27 @@ public class UsersRestController {
     }
 
     @GetMapping("/users")
-    public List<UserDTO> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         //return userService.findAll();
-        return userService.findAll().stream().map(this::convertToUserDTO)
+        List<UserDTO> userDTOs = userService.findAll().stream().map(this::convertToUserDTO)
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDTOs);
     }
 
     @GetMapping("/users/{id}")
-    public UserDTO getUser(@PathVariable("id") int id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable("id") int id) {
       //  return userService.findById(id);//Jackson конвертирует отданный объект в JSON
         Optional<User> optionalUser = userService.findById(id);
+
         if (optionalUser.isPresent()){
             UserDTO userDTO = convertToUserDTO(optionalUser.get());
-          //  return ResponseEntity.ok(userDTO);
-            return userDTO;
+            return ResponseEntity.ok(userDTO);
+           // return userDTO;
         } else {
+            // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             throw new UserNotFoundException("User with ID " + id + " not found");
         }
-
     }
 
     //ResponseEntity<> - может вернуть любой объект и Jackson его конвертнет в JSON
@@ -65,10 +68,8 @@ public class UsersRestController {
     //мы принимаем DTO от клиента и здесь же конвертируем его в модель
     @PostMapping()
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
-        System.out.println("зашли в метод create");
 
         if (bindingResult.hasErrors()) {
-            System.out.println("зашли в bindingResult метода create");
             StringBuilder errorMessage = new StringBuilder();
             List<FieldError> errors = bindingResult.getFieldErrors();
             for (FieldError error : errors) {
