@@ -26,7 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()//временное отключение для POSTMAN
+               // .csrf().disable()//временное отключение для POSTMAN
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
@@ -44,6 +44,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login");
     }
+
+    /*
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .anyRequest().permitAll() // Разрешаем все запросы без аутентификации
+                .and()
+                .httpBasic().disable() // Отключаем базовую аутентификацию
+                .formLogin().disable() // Отключаем форму входа
+                .logout().disable(); // Отключаем обработку выхода
+    }
+*/
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceImpl)
