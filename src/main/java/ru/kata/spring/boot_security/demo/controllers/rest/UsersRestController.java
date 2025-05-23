@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.dto.LoginRequest;
 import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.dto.UserRegistrationDTO;
 import ru.kata.spring.boot_security.demo.models.Role;
@@ -19,15 +21,14 @@ import ru.kata.spring.boot_security.demo.util.UserErrorResponse;
 import ru.kata.spring.boot_security.demo.util.UserNotCreatedException;
 import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") // Добавляем CORS
 public class UsersRestController {
 
     private final UserService userService;
@@ -40,11 +41,29 @@ public class UsersRestController {
         this.roleService = roleService;
         this.modelMapper = modelMapper;
     }
+    @GetMapping("/csrf")
+    public ResponseEntity<Map<String, String>> getCsrfToken(HttpServletRequest request) {
+        CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
+        return ResponseEntity.ok(Map.of("token", token.getToken()));
+    }
+//    @PostMapping("/login")
+//    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+//
+//        Authentication authentication = authenticationMa
+//
+//    }
 
     @GetMapping("/user") //REST для вывода залогиненного пользователя.
-    public User getCurrentUser() {
+    public ResponseEntity<UserDTO> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (User) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
+
+        // Получаем полные данные пользователя из базы (чтобы быть уверенными в актуальности)
+        User fullUser = userService.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException("Current user not found in database"));
+        // Конвертируем в DTO
+        UserDTO userDTO = convertToUserDTO(fullUser);
+        return ResponseEntity.ok(userDTO);
     }
 
     @GetMapping("/users")

@@ -42,7 +42,7 @@ public class AdminsController {
     }
 
     //Удаление пользователя через Модальное окно
-    @DeleteMapping("/deleteUser")
+    @PostMapping("/deleteUser")
     public String deleteUser(@RequestParam("id") int id) {
         System.out.println("зашли в метод delete");
         userService.deleteUserById(id);
