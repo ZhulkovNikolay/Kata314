@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.dto.LoginDTO;
 import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.dto.UserRegistrationDTO;
+import ru.kata.spring.boot_security.demo.dto.UserUpdateDTO;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
@@ -42,24 +43,34 @@ public class UsersRestController {
         this.modelMapper = modelMapper;
     }
 
+
     @PostMapping("/login")
-    public ResponseEntity<String> login() {
+    public ResponseEntity<UserDTO> login() {
         System.out.println("Кто-то вошел в логин");
         // Spring Security автоматически проверит Basic Auth из заголовка
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Залогинился " + auth.getName());
+
+        UserDTO userDTO = convertToUserDTO((User) auth.getPrincipal());
+
         if (auth != null && auth.isAuthenticated()) {
-            return ResponseEntity.ok("Welcome, " + auth.getName() + "!");
+            return ResponseEntity.ok(userDTO);
         } else {
-            return ResponseEntity.status(401).body("Access denied");
+            throw new UserNotFoundException("User with Name " + auth.getName() + " not found");
         }
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getAllRoles() {
+        return ResponseEntity.ok(roleService.findAll());
     }
 
 
     @GetMapping("/user") //REST для вывода залогиненного пользователя.
-    public User getCurrentUser() {
+    public ResponseEntity<UserDTO> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (User) authentication.getPrincipal();
+        UserDTO userDTO = convertToUserDTO((User) authentication.getPrincipal());
+        return ResponseEntity.ok(userDTO);
     }
 
     @GetMapping("/users")
@@ -73,17 +84,40 @@ public class UsersRestController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable("id") int id) {
-      //  return userService.findById(id);//Jackson конвертирует отданный объект в JSON
+        //  return userService.findById(id);//Jackson конвертирует отданный объект в JSON
         Optional<User> optionalUser = userService.findById(id);
 
-        if (optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             UserDTO userDTO = convertToUserDTO(optionalUser.get());
             return ResponseEntity.ok(userDTO);
-           // return userDTO;
+            // return userDTO;
         } else {
             // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             throw new UserNotFoundException("User with ID " + id + " not found");
         }
+    }
+
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            System.out.println("зашли в bindingResult.hasErrors()");
+            System.out.println(bindingResult.getFieldErrors());
+            System.out.println(bindingResult.getAllErrors());
+        }
+
+        User user = convertToUser(userRegistrationDTO);
+
+        userService.updateUser(user);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.ok().build();
     }
 
     //ResponseEntity<> - может вернуть любой объект и Jackson его конвертнет в JSON

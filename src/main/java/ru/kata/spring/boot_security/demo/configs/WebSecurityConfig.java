@@ -49,8 +49,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureUrl("/login?error")
                 .and()
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login");
+                .logoutUrl("/api/logout")
+                .logoutSuccessUrl("/api/login")
+                .deleteCookies("JSESSIONID") // Удаление куки сессии
+                .invalidateHttpSession(true) // Инвалидация сессии
+                .clearAuthentication(true); // Очистка аутентификации
     }
 
     /*
@@ -79,8 +82,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://127.0.0.1:3000")); // Your frontend URL
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of("http://localhost:8080","http://127.0.0.1:3000","http://localhost:63343/")); // Your frontend URL
+        config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // Allow cookies/session
 
