@@ -1,9 +1,12 @@
 package ru.kata.spring.boot_security.demo.dto;
 
 
+import ru.kata.spring.boot_security.demo.models.Role;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 public class UserDTO {
     //поля которые мы будем отправлять и принимать от клиента
@@ -15,6 +18,18 @@ public class UserDTO {
     @Email
     @NotEmpty(message = "Почтовый адрес не должен быть пустым")
     private String email;
+
+    private List<RoleDTO> roles;
+
+    public List<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleDTO> roles) {
+        this.roles = roles;
+    }
+
+
 
     public String getUsername() {
         return username;
