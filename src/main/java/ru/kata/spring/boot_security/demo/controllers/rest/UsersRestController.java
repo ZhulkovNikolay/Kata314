@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.dto.LoginDTO;
 import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.dto.UserRegistrationDTO;
 import ru.kata.spring.boot_security.demo.models.Role;
@@ -40,6 +41,20 @@ public class UsersRestController {
         this.roleService = roleService;
         this.modelMapper = modelMapper;
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login() {
+        System.out.println("Кто-то вошел в логин");
+        // Spring Security автоматически проверит Basic Auth из заголовка
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Залогинился " + auth.getName());
+        if (auth != null && auth.isAuthenticated()) {
+            return ResponseEntity.ok("Welcome, " + auth.getName() + "!");
+        } else {
+            return ResponseEntity.status(401).body("Access denied");
+        }
+    }
+
 
     @GetMapping("/user") //REST для вывода залогиненного пользователя.
     public User getCurrentUser() {
