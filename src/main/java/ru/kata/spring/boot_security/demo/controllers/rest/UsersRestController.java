@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.kata.spring.boot_security.demo.dto.LoginDTO;
 import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.dto.UserRegistrationDTO;
@@ -21,11 +22,10 @@ import ru.kata.spring.boot_security.demo.util.UserErrorResponse;
 import ru.kata.spring.boot_security.demo.util.UserNotCreatedException;
 import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -58,6 +58,18 @@ public class UsersRestController {
         } else {
             throw new UserNotFoundException("User with Name " + auth.getName() + " not found");
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        System.out.println("Вошли в logout");
+        // Ручная инвалидация сессии
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok().body(Map.of("message", "Logout successful"));
     }
 
     @GetMapping("/roles")
@@ -99,17 +111,31 @@ public class UsersRestController {
 
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             System.out.println("зашли в bindingResult.hasErrors()");
             System.out.println(bindingResult.getFieldErrors());
             System.out.println(bindingResult.getAllErrors());
         }
+        User existingUser = userService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found with id: " + id
+                ));
+        User userFromFront = convertToUser(userRegistrationDTO);
 
-        User user = convertToUser(userRegistrationDTO);
+       // existingUser.setUsername(userRegistrationDTO.getUsername());
+       // existingUser.setPassword(userRegistrationDTO.getPassword());
+       // existingUser.setEmail(userRegistrationDTO.getEmail());
+        // userService.updateUser(existingUser);
+        System.out.println("Пользователь, пришедший с фронта: "+ userFromFront.toString());
+        System.out.println("Найденный пользователь в БД по такому ИД: " + existingUser.toString());
 
-        userService.updateUser(user);
+        //TODO Костыль. Так как с фронта приходит id = 0
+
+        userService.updateUser(userFromFront);
+        System.out.println("Юзер сервис успешно отработал");
         return ResponseEntity.ok().build();
     }
 

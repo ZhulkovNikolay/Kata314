@@ -39,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/login", "error").permitAll()
                 .antMatchers("/api/login", "error").permitAll()
+                .antMatchers("/api/logout", "error").permitAll()
                 .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
                 .httpBasic()//Чтобы работал Postman
@@ -50,7 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/api/logout")
-                .logoutSuccessUrl("/api/login")
+                //.logoutSuccessUrl("/api/login")
+                .logoutSuccessUrl("http://localhost:63343/login.html")
                 .deleteCookies("JSESSIONID") // Удаление куки сессии
                 .invalidateHttpSession(true) // Инвалидация сессии
                 .clearAuthentication(true); // Очистка аутентификации
@@ -82,7 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:8080","http://127.0.0.1:3000","http://localhost:63343/")); // Your frontend URL
+        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080","http://127.0.0.1:3000","http://localhost:63343/")); // Your frontend URL
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // Allow cookies/session

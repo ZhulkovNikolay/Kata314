@@ -1,15 +1,13 @@
 package ru.kata.spring.boot_security.demo.dto;
 
-import ru.kata.spring.boot_security.demo.models.Role;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class UserRegistrationDTO {
+
+    private Integer id;
 
     @NotEmpty(message = "Имя не должно быть пустым")
     @Size(min = 2, max = 100, message = "Имя должно быть от 2 до 100 символов")
@@ -23,6 +21,14 @@ public class UserRegistrationDTO {
 
     @NotEmpty(message = "Выберите хотя бы одну роль")
     private Set<Integer> roleIds; // нужны ИД ролей, так как из-за ссылок появляется циклическая зависимость.
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -48,7 +54,7 @@ public class UserRegistrationDTO {
         this.password = password;
     }
 
-    public Set<Integer> getRoleIds() {
+    public @NotEmpty(message = "Выберите хотя бы одну роль") Set<Integer> getRoleIds() {
         return roleIds;
     }
 
