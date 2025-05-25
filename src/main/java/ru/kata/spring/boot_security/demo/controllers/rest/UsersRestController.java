@@ -132,8 +132,6 @@ public class UsersRestController {
         System.out.println("Пользователь, пришедший с фронта: "+ userFromFront.toString());
         System.out.println("Найденный пользователь в БД по такому ИД: " + existingUser.toString());
 
-        //TODO Костыль. Так как с фронта приходит id = 0
-
         userService.updateUser(userFromFront);
         System.out.println("Юзер сервис успешно отработал");
         return ResponseEntity.ok().build();
@@ -149,9 +147,9 @@ public class UsersRestController {
     //ResponseEntity<> - может вернуть любой объект и Jackson его конвертнет в JSON
     //RequestBody - сконвертирует пришедший JSON в Java объект
     //мы принимаем DTO от клиента и здесь же конвертируем его в модель
-    @PostMapping()
+    @PostMapping("/users/register")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
-
+        System.out.println("вошли в create");
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             List<FieldError> errors = bindingResult.getFieldErrors();
