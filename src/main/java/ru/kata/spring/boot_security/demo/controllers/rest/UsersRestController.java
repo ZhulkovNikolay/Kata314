@@ -9,11 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import ru.kata.spring.boot_security.demo.dto.LoginDTO;
 import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.dto.UserRegistrationDTO;
-import ru.kata.spring.boot_security.demo.dto.UserUpdateDTO;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
@@ -32,6 +29,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class UsersRestController {
 
+    // ВИДЕО КАК РАБОТАЕТ ПРИЛОЖЕНИЕ
+    // https://youtu.be/FJ8aDQWZCRs
+
+
     private final UserService userService;
     private final RoleService roleService;
     private final ModelMapper modelMapper;
@@ -46,10 +47,7 @@ public class UsersRestController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDTO> login() {
-        System.out.println("Кто-то вошел в логин");
-        // Spring Security автоматически проверит Basic Auth из заголовка
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Залогинился " + auth.getName());
 
         UserDTO userDTO = convertToUserDTO((User) auth.getPrincipal());
 
@@ -63,7 +61,6 @@ public class UsersRestController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         System.out.println("Вошли в logout");
-        // Ручная инвалидация сессии
         SecurityContextHolder.clearContext();
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -85,60 +82,43 @@ public class UsersRestController {
         return ResponseEntity.ok(userDTO);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/admin/users")
     public ResponseEntity<List<UserDTO>> getUsers() {
-        //return userService.findAll();
         List<UserDTO> userDTOs = userService.findAll().stream().map(this::convertToUserDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDTOs);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/admin/users/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable("id") int id) {
-        //  return userService.findById(id);//Jackson конвертирует отданный объект в JSON
         Optional<User> optionalUser = userService.findById(id);
 
         if (optionalUser.isPresent()) {
             UserDTO userDTO = convertToUserDTO(optionalUser.get());
             return ResponseEntity.ok(userDTO);
-            // return userDTO;
         } else {
-            // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             throw new UserNotFoundException("User with ID " + id + " not found");
         }
     }
 
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/admin/users/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            System.out.println("зашли в bindingResult.hasErrors()");
             System.out.println(bindingResult.getFieldErrors());
             System.out.println(bindingResult.getAllErrors());
         }
-        User existingUser = userService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found with id: " + id
-                ));
+
         User userFromFront = convertToUser(userRegistrationDTO);
 
-       // existingUser.setUsername(userRegistrationDTO.getUsername());
-       // existingUser.setPassword(userRegistrationDTO.getPassword());
-       // existingUser.setEmail(userRegistrationDTO.getEmail());
-        // userService.updateUser(existingUser);
-        System.out.println("Пользователь, пришедший с фронта: "+ userFromFront.toString());
-        System.out.println("Найденный пользователь в БД по такому ИД: " + existingUser.toString());
-
         userService.updateUser(userFromFront);
-        System.out.println("Юзер сервис успешно отработал");
         return ResponseEntity.ok().build();
     }
 
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/admin/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
         return ResponseEntity.ok().build();
@@ -147,7 +127,7 @@ public class UsersRestController {
     //ResponseEntity<> - может вернуть любой объект и Jackson его конвертнет в JSON
     //RequestBody - сконвертирует пришедший JSON в Java объект
     //мы принимаем DTO от клиента и здесь же конвертируем его в модель
-    @PostMapping("/users/register")
+    @PostMapping("/admin/users/register")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO, BindingResult bindingResult) {
         System.out.println("вошли в create");
         if (bindingResult.hasErrors()) {
@@ -162,10 +142,9 @@ public class UsersRestController {
             //И (методом ниже) через ExceptionHandler отдаем клиенту JSON с ошибкой
             throw new UserNotCreatedException(errorMessage.toString());
         }
-        //userService.register(user);
         userService.register(convertToUser(userRegistrationDTO));
         System.out.println("зарегали юзера сервисом");
-        return ResponseEntity.ok(HttpStatus.OK); //возврат пустого ответа со статусом 200
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //Эти методы возвращают JSON с сообщением об ошибке
@@ -174,7 +153,7 @@ public class UsersRestController {
         UserErrorResponse response = new UserErrorResponse(
                 "User with this ID was not found", System.currentTimeMillis()
         );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); // 404
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
@@ -187,7 +166,6 @@ public class UsersRestController {
     }
 
     private User convertToUser(UserRegistrationDTO userRegistrationDTO) {
-        // ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(userRegistrationDTO, User.class);
 
         Set<Role> roles = new HashSet<>();
@@ -197,7 +175,6 @@ public class UsersRestController {
             roles.add(role);
         }
         user.setRoles(roles);
-        // user.setRoles(userRegistrationDTO.getRoleIds());
 
         return user;
     }

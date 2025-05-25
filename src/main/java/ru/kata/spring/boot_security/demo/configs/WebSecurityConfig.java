@@ -19,12 +19,10 @@ import java.util.List;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-    private final SuccessUserHandler successUserHandler;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, SuccessUserHandler successUserHandler) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl) {
         this.userDetailsServiceImpl = userDetailsServiceImpl;
-        this.successUserHandler = successUserHandler;
     }
 
     //TODO вернуть csrf
@@ -35,8 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()//временное отключение для POSTMAN
                 .authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/login", "error").permitAll()
                 .antMatchers("/api/login", "error").permitAll()
                 .antMatchers("/api/logout", "error").permitAll()
@@ -45,7 +43,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()//Чтобы работал Postman
                 .and()
                 .formLogin().loginPage("/login")
-                .successHandler(successUserHandler)
                 .loginProcessingUrl("/process_login")
                 .failureUrl("/login?error")
                 .and()
@@ -57,19 +54,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true) // Инвалидация сессии
                 .clearAuthentication(true); // Очистка аутентификации
     }
-
-    /*
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests()
-                .anyRequest().permitAll() // Разрешаем все запросы без аутентификации
-                .and()
-                .httpBasic().disable() // Отключаем базовую аутентификацию
-                .formLogin().disable() // Отключаем форму входа
-                .logout().disable(); // Отключаем обработку выхода
-    }
-*/
 
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceImpl)
@@ -84,7 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080","http://127.0.0.1:3000","http://localhost:63343/")); // Your frontend URL
+        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080","http://127.0.0.1:3000","http://localhost:63343/"));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // Allow cookies/session

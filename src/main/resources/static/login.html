@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Please Sign In</h3>
+
+                <!-- Сообщения об ошибках -->
+                <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+                <div id="logoutMessage" class="alert alert-success d-none" role="alert">
+                    You have been logged out.
+                </div>
+
+                <!-- Форма логина -->
+                <div id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+
+                    <!-- CSRF токен будет добавлен динамически -->
+                    <input type="hidden" id="csrfToken" name="_csrf">
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-block" onclick="login()">Sign in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('http://localhost:8080/api/login', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa(username + ":" + password),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                // Получаем данные пользователя из ответа
+                const userData = await response.json();
+
+                // Проверяем наличие роли ADMIN
+                const isAdmin = userData.roles.some(role => role.name === 'ROLE_ADMIN');
+
+                // Перенаправляем в зависимости от роли
+                if(isAdmin) {
+                    window.location.href = "/allusers.html";
+                } else {
+                    window.location.href = "/user.html";
+                }
+
+            } else {
+                throw new Error(await response.text());
+            }
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert("Login failed: " + error.message);
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js?t=${new Date().getTime()}"></script>
+</body>
+</html>
